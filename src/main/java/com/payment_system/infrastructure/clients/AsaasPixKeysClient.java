@@ -16,7 +16,7 @@ import java.util.Set;
 @Component
 public class AsaasPixKeysClient implements PixOperations {
 
-    @Value("${asaas.api.token}")
+    @Value("${asaas.api.token.prod}")
     private String asaasToken;
 
     private final ObjectMapper objectMapper;
@@ -29,7 +29,7 @@ public class AsaasPixKeysClient implements PixOperations {
     public PixKeyResponseDto createPixKey() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api-sandbox.asaas.com/v3/pix/addressKeys"))
+                    .uri(URI.create("https://api.asaas.com/v3/pix/addressKeys"))
                     .header("accept", "application/json")
                     .header("User-Agent", "payment_system/1.0.0")
                     .header("content-type", "application/json")
@@ -55,7 +55,7 @@ public class AsaasPixKeysClient implements PixOperations {
     public Set<PixKeyResponseDto> getKeys() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api-sandbox.asaas.com/v3/pix/addressKeys"))
+                    .uri(URI.create("https://api.asaas.com/v3/pix/addressKeys"))
                     .header("accept", "application/json")
                     .header("User-Agent", "payment_system/1.0.0")
                     .header("access_token", asaasToken)
