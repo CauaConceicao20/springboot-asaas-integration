@@ -1,15 +1,17 @@
 package com.payment_system.service.interfaces;
 
-import com.payment_system.dto.ChargeListResponseDto;
 import com.payment_system.dto.ChargeRequestDto;
 import com.payment_system.dto.ChargeResponseDto;
+import com.payment_system.dto.QrCodePixRequestDto;
+import com.payment_system.dto.QrCodePixResponseDto;
 
 import java.util.Set;
 
 public interface ChargeOperations {
 
     ChargeResponseDto createCharge(ChargeRequestDto body);
-    Set<ChargeListResponseDto> getAllCharge();
+    QrCodePixResponseDto createQrCodePixStatic(QrCodePixRequestDto body);
+    Set<ChargeResponseDto> getAllCharge();
     void updateCharge();
     void deleteCharge();
 }

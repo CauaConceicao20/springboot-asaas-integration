@@ -1,11 +1,11 @@
 package com.payment_system.controller;
 
-import com.payment_system.dto.ChargeListResponseDto;
 import com.payment_system.dto.ChargeRequestDto;
 import com.payment_system.dto.ChargeResponseDto;
+import com.payment_system.dto.QrCodePixRequestDto;
+import com.payment_system.dto.QrCodePixResponseDto;
 import com.payment_system.service.ChargeService;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,15 +18,21 @@ public class ChargeController {
 
     private final ChargeService chargeService;
 
-    @PostMapping("/createPix")
-    public ResponseEntity<ChargeResponseDto> createCharge(@RequestBody ChargeRequestDto request) {
-        ChargeResponseDto response = chargeService.createCharge(request);
+    @PostMapping("/createCharge")
+    public ResponseEntity<ChargeResponseDto> createCharge(@RequestBody ChargeRequestDto body) {
+        ChargeResponseDto response = chargeService.createCharge(body);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/createQrCodePixStatic")
+    public ResponseEntity<QrCodePixResponseDto> createQrCodePixStatic(@RequestBody QrCodePixRequestDto request) {
+        QrCodePixResponseDto response = chargeService.createQrCodePixStatic(request);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<Set<ChargeListResponseDto>> getAllCharge() {
-        Set<ChargeListResponseDto> response = chargeService.getAllCharge();
+    public ResponseEntity<Set<ChargeResponseDto>> getAllCharge() {
+        Set<ChargeResponseDto> response = chargeService.getAllCharge();
         return ResponseEntity.ok().body(response);
 
     }
