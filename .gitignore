@@ -1,3 +1,14 @@
+### Configurações com dados sensíveis (Segurança) ###
+**/src/main/resources/application.properties
+**/src/main/resources/application.yml
+
+### Logs e Sistema ###
+*.log
+logs/
+.DS_Store
+Thumbs.db
+
+### Spring Boot Padrão ###
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
