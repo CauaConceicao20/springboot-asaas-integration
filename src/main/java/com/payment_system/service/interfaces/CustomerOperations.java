@@ -1,10 +1,10 @@
 package com.payment_system.service.interfaces;
 
-import com.payment_system.dto.CustomerResponseDto;
+import com.asaas.apisdk.models.CustomerListResponseDto;
 
 import java.util.Set;
 
 public interface CustomerOperations {
 
-    Set<CustomerResponseDto> getAllCustomer();
+    Set<CustomerListResponseDto> getAllCustomer();
 }

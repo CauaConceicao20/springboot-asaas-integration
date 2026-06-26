@@ -1,6 +1,6 @@
 package com.payment_system.controller;
 
-import com.payment_system.dto.CustomerResponseDto;
+import com.asaas.apisdk.models.CustomerListResponseDto;
 import com.payment_system.service.CustomerService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/getAll")
-    public ResponseEntity <Set<CustomerResponseDto>> getAllCustomer() {
+    public ResponseEntity <Set<CustomerListResponseDto>> getAllCustomer() {
         return ResponseEntity.ok().body(customerService.getAllCustomer());
     }
 }

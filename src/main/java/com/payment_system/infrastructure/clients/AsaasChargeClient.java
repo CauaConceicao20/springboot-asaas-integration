@@ -1,114 +1,127 @@
 package com.payment_system.infrastructure.clients;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.payment_system.dto.ChargeRequestDto;
-import com.payment_system.dto.ChargeResponseDto;
-import com.payment_system.dto.QrCodePixRequestDto;
-import com.payment_system.dto.QrCodePixResponseDto;
-import com.payment_system.infrastructure.config.JacksonConfig;
+import com.asaas.apisdk.models.*;
+import com.asaas.apisdk.services.PaymentService;
+
+import com.asaas.apisdk.services.PixService;
 import com.payment_system.service.interfaces.ChargeOperations;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.Set;
 
 @Component
+@RequiredArgsConstructor
 public class AsaasChargeClient implements ChargeOperations {
 
-    @Value("${asaas.api.token.prod}")
-    private String asaasToken;
+    private final PaymentService paymentService;
 
-    private final ObjectMapper objectMapper;
-
-    public AsaasChargeClient(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    @Override
+    public PaymentGetResponseDto createPayment(PaymentSaveRequestDto body) {
+        return paymentService.createNewPayment(body);
     }
 
     @Override
-    public ChargeResponseDto createCharge(ChargeRequestDto body) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.asaas.com/v3/payments"))
-                    .header("User-Agent", "payment_system/1.0.0")
-                    .header("accept", "application/json")
-                    .header("content-type", "application/json")
-                    .header("access_token", asaasToken)
-                    .method("POST", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)))
-                    .build();
-
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
-            if(response.statusCode() != 200) {
-                throw new RuntimeException("Falha ao criar cobrança " + response.body());
-            }
-
-            return objectMapper.readValue(response.body(), ChargeResponseDto.class);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public QrCodePixResponseDto createQrCodePixStatic(QrCodePixRequestDto body) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.asaas.com/v3/pix/qrCodes/static"))
-                    .header("User-Agent", "payment_system/1.0.0")
-                    .header("accept", "application/json")
-                    .header("content-type", "application/json")
-                    .header("access_token", asaasToken)
-                    .method("POST", HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body)))
-                    .build();
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
-            if(response.statusCode() != 200) {
-                throw new RuntimeException("Falha ao criar cobrança " + response.body());
-            }
-
-            return objectMapper.readValue(response.body(), QrCodePixResponseDto.class);
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public Set<ChargeResponseDto> getAllCharge() {
-        try {
-            HttpRequest request = HttpRequest.newBuilder().
-                    uri(URI.create("https://api.asaas.com/v3/payments"))
-                    .header("User-Agent", "payment_system/1.0.0")
-                    .header("accept", "application/json")
-                    .header("access_token", asaasToken)
-                    .method("GET", HttpRequest.BodyPublishers.noBody())
-                    .build();
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request,
-                    HttpResponse.BodyHandlers.ofString());
-
-            if(response.statusCode() != 200) {
-                throw new RuntimeException("Falha ao buscar cobrança " + response.body());
-            }
-
-           return Set.of(objectMapper.readValue(response.body(), ChargeResponseDto.class));
-        }catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void updateCharge() {
-
-    }
-
-    @Override
-    public void deleteCharge() {
-
+    public Set<PaymentListResponseDto> getAllCharge() {
+        return Set.of(paymentService.listPayments());
     }
 }
+
+ /*
+PIX
+
+{
+  "customer": "cus_000001",
+  "billingType": "PIX",
+  "value": 150.00,
+  "dueDate": "2026-06-30",
+  "description": "Pagamento via PIX"
+}
+*/
+
+/*
+BOLETO
+
+{
+  "customer": "cus_000001",
+  "billingType": "BOLETO",
+  "value": 150.00,
+  "dueDate": "2026-06-30",
+  "description": "Pagamento via boleto",
+  "daysAfterDueDateToRegistrationCancellation": 5,
+  "postalService": false
+}
+*/
+
+/*
+CARTÃO DE CRÉDITO (À VISTA)
+
+{
+  "customer": "cus_000001",
+  "billingType": "CREDIT_CARD",
+  "value": 150.00,
+  "dueDate": "2026-06-30",
+  "description": "Pagamento no cartão"
+}
+*/
+
+/*
+CARTÃO DE CRÉDITO PARCELADO (VALOR TOTAL)
+
+{
+  "customer": "cus_000001",
+  "billingType": "CREDIT_CARD",
+  "dueDate": "2026-06-30",
+  "installmentCount": 6,
+  "totalValue": 600.00,
+  "description": "Compra parcelada"
+}
+
+O Asaas calcula automaticamente:
+600.00 / 6 = 100.00 por parcela
+*/
+
+/*
+CARTÃO DE CRÉDITO PARCELADO (VALOR DA PARCELA)
+
+{
+  "customer": "cus_000001",
+  "billingType": "CREDIT_CARD",
+  "dueDate": "2026-06-30",
+  "installmentCount": 6,
+  "installmentValue": 100.00,
+  "description": "Compra parcelada"
+}
+
+O Asaas calcula automaticamente:
+6 x 100.00 = 600.00
+*/
+
+/*
+EXEMPLO COMPLETO COM DESCONTO, JUROS E MULTA
+
+{
+  "customer": "cus_000001",
+  "billingType": "PIX",
+  "value": 150.00,
+  "dueDate": "2026-06-30",
+  "description": "Mensalidade",
+  "externalReference": "PEDIDO-123",
+
+  "discount": {
+    "value": 10,
+    "dueDateLimitDays": 3,
+    "type": "PERCENTAGE"
+  },
+
+  "interest": {
+    "value": 1
+  },
+
+  "fine": {
+    "value": 2,
+    "type": "PERCENTAGE"
+  }
+}
+*/
