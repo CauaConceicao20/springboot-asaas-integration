@@ -1,8 +1,8 @@
 package com.payment_system.service;
 
 import com.asaas.apisdk.models.*;
-import com.payment_system.infrastructure.utils.QrCodeConverter;
 import com.payment_system.service.interfaces.PixOperations;
+import com.payment_system.service.interfaces.QrCodeOperations;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class PixService {
 
-    private final QrCodeConverter qrCodeConverter;
+    private final QrCodeOperations qrCodeOperations;
 
     private final PixOperations pixOperations;
 
@@ -26,7 +26,7 @@ public class PixService {
 
     public PixQrCodeSaveResponseDto createQrCodePixStatic(PixQrCodeSaveRequestDto body) {
         PixQrCodeSaveResponseDto response = pixOperations.createQrCodePixStatic(body);
-        qrCodeConverter.generateQrCodeImage(response.getEncodedImage(), String.valueOf(response.getId()));
+        qrCodeOperations.generateQrCodeImage(response.getEncodedImage(), String.valueOf(response.getId()));
         return response;
     }
 }

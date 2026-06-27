@@ -1,5 +1,6 @@
 package com.payment_system.infrastructure.utils;
 
+import com.payment_system.service.interfaces.QrCodeOperations;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.nio.file.Paths;
 import java.util.Base64;
 
 @Component
-public class QrCodeConverter {
+public class QrCodeConverter implements QrCodeOperations {
 
     private static final String OUTPUT_DIR = "qrcodes/";
 
